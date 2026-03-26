@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio | Vibe Coder & WordPress Developer</title>
+  <meta name="description" content="بورتفوليو مبرمج Vibe Coding وWordPress - مشاريع احترافية بأحدث التقنيات والذكاء الاصطناعي" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== EDIT MODE PANEL ===== -->
+  <div class="edit-panel" id="editPanel">
+    <div class="edit-panel-header">
+      <span>⚙️ وضع التعديل</span>
+      <div class="edit-header-actions">
+        <button class="edit-save-btn" id="editSaveBtn" onclick="lockEditMode()">🔒 قفل &amp; نشر</button>
+        <button class="edit-close-btn" onclick="toggleEditBar()">✕</button>
+      </div>
+    </div>
+    <div class="edit-panel-body">
+      <p class="edit-hint">اضغط على أي بطاقة مشروع لتعديلها أو رفع فيديوها</p>
+      <div class="edit-actions-row">
+        <button class="edit-action-btn" onclick="addNewCard()">＋ أضف مشروع جديد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Mode Toggle Button -->
+  <button class="edit-toggle-fab" id="editToggleFab" onclick="toggleEditBar()" title="وضع التعديل">
+    ✏️
+  </button>
+
+  <!-- ===== CARD EDITOR MODAL ===== -->
+  <div class="card-editor-modal" id="cardEditorModal">
+    <div class="card-editor-overlay" onclick="closeCardEditor()"></div>
+    <div class="card-editor-inner">
+      <div class="card-editor-header">
+        <h3>✏️ تعديل المشروع</h3>
+        <button onclick="closeCardEditor()">✕</button>
+      </div>
+      <div class="card-editor-body">
+
+        <!-- Card Type Toggle -->
+        <div class="editor-field">
+          <label>🎯 نوع المحتوى</label>
+          <div class="type-toggle">
+            <button class="type-btn active" id="typeBtnVideo" onclick="switchCardType('video')">🎬 فيديو</button>
+            <button class="type-btn" id="typeBtnLink" onclick="switchCardType('link')">🔗 لينك موقع</button>
+          </div>
+        </div>
+
+        <!-- === VIDEO SECTION === -->
+        <div id="videoSection">
+          <div class="editor-field">
+            <label>📹 رابط يوتيوب أو فيديو محلي</label>
+            <input type="url" id="editorYoutube" class="editor-input" placeholder="مثال: https://youtube.com/watch?v=..." dir="ltr" style="margin-bottom: 12px;" />
+            
+            <div class="video-upload-zone" id="videoUploadZone" onclick="document.getElementById('videoFileInput').click()">
+              <div class="upload-icon">🎬</div>
+              <div class="upload-text">اضغط لرفع فيديو محلي أو اسحبه هنا<br><small>MP4 / WebM / MOV</small></div>
+              <input type="file" id="videoFileInput" accept="video/*" onchange="handleVideoUpload(event)" hidden />
+            </div>
+            <div class="video-preview-wrap" id="videoPreviewWrap" style="display:none">
+              <video id="videoPreview" controls playsinline></video>
+              <button class="remove-video-btn" onclick="removeVideo()">🗑️ حذف الفيديو</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- === LINK SECTION === -->
+        <div id="linkSection" style="display:none">
+          <div class="editor-field">
+            <label>🌐 رابط الموقع (URL)</label>
+            <input type="url" id="editorLink" class="editor-input" placeholder="https://example.com" dir="ltr" />
+          </div>
+          <div class="editor-field">
+            <label>🔘 نص زرار الرابط</label>
+            <input type="text" id="editorLinkLabel" class="editor-input" placeholder="زيارة الموقع" />
+          </div>
+        </div>
+
+        <!-- Thumbnail Upload (shared) -->
+        <div class="editor-field">
+          <label>🖼️ صورة الغلاف (Thumbnail)</label>
+          <div class="thumb-upload-row">
+            <div class="thumb-preview" id="thumbPreview"></div>
+            <div>
+              <input type="file" id="thumbFileInput" accept="image/*" onchange="handleThumbUpload(event)" hidden />
+              <button class="btn-outline-sm" onclick="document.getElementById('thumbFileInput').click()">📷 اختر صورة</button>
+              <p class="hint-text" id="thumbHint">أو هيتاخد أول فريم من الفيديو، في اليوتيوب هيتسحب أوتوماتيك</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="editor-field">
+          <label>📝 اسم المشروع</label>
+          <input type="text" id="editorTitle" class="editor-input" placeholder="مثال: موقع تجاري + متجر إلكتروني" />
+        </div>
+
+        <!-- Description -->
+        <div class="editor-field">
+          <label>📄 وصف قصير</label>
+          <textarea id="editorDesc" class="editor-input editor-textarea" placeholder="وصف المشروع في سطرين..."></textarea>
+        </div>
+
+        <!-- Tags -->
+        <div class="editor-field">
+          <label>🏷️ التقنيات (مفصولة بفواصل)</label>
+          <input type="text" id="editorTags" class="editor-input" placeholder="WordPress, WooCommerce, AI" />
+        </div>
+
+        <!-- Card Size -->
+        <div class="editor-field">
+          <label>📐 حجم البطاقة</label>
+          <div class="size-options">
+            <label class="size-option"><input type="radio" name="cardSize" value="normal" checked /> عادي</label>
+            <label class="size-option"><input type="radio" name="cardSize" value="featured" /> كبير (2 عمود)</label>
+            <label class="size-option"><input type="radio" name="cardSize" value="wide" /> عريض (2 عمود)</label>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-editor-footer">
+        <button class="btn-editor-cancel" onclick="closeCardEditor()">إلغاء</button>
+        <button class="btn-editor-delete" id="cardDeleteBtn" onclick="deleteCurrentCard()">🗑️ حذف البطاقة</button>
+        <button class="btn-editor-save" onclick="saveCardChanges()">💾 حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <span class="logo-dot"></span>
+        <span id="siteNameDisplay">Dev<strong>Portfolio</strong></span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero" data-i18n="nav_home">الرئيسية</a></li>
+        <li><a href="#projects" data-i18n="nav_projects">المشاريع</a></li>
+        <li><a href="#skills" data-i18n="nav_skills">المهارات</a></li>
+        <li><a href="#contact" data-i18n="nav_contact">تواصل</a></li>
+      </ul>
+      <a href="#contact" class="nav-cta" data-i18n="nav_cta">ابدأ مشروعك 🚀</a>
+      <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">EN</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-content">
+      <div class="hero-personal-intro">
+        <h2 class="intro-name"><span data-i18n="hero_hello">مرحباً، أنا</span> <span class="gradient-text">عبدالله أحمد الدكروري</span> 👋</h2>
+        <div class="intro-uni">
+          <div class="uni-logo-small">
+            <img src="nmu-logo.png" alt="جامعة المنصورة الجديدة" />
+          </div>
+          <span data-i18n="hero_uni">طالب Level 2 - ذكاء اصطناعي بـ جامعة المنصورة الجديدة | 20 سنة</span>
+        </div>
+      </div>
+
+      <h1 class="hero-title" style="font-size: 3rem; line-height: 1.3; margin-top: 20px;" data-i18n="hero_title">
+        بدمج الـ <span class="gradient-text">AI</span> في<br>كل سطر كود بكتبه.
+      </h1>
+      
+      <p class="hero-sub" data-i18n="hero_desc">
+        شغفي هو الذكاء الاصطناعي وتطوير الويب. كمبرمج <strong>Vibe Coder</strong> و <strong>WordPress Expert</strong>، بستخدم أحدث تقنيات الـ AI لبناء أنظمة كاملة (Web Apps, ERP Systems, Landing Pages) بسرعة ودقة فائقة.
+      </p>
+      
+      <div class="hero-actions">
+        <a href="#projects" class="btn-primary" id="hero-cta-projects" data-i18n="hero_btn_work">شوف شغلي</a>
+        <a href="#contact" class="btn-ghost" id="hero-cta-contact" data-i18n="hero_btn_contact">تواصل معي</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num" data-target="30">0</span>+
+          <span class="stat-label" data-i18n="hero_stat1">مشروع منجز</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num" data-target="100">0</span>%
+          <span class="stat-label" data-i18n="hero_stat2">اعتماد على الـ AI</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-visual">
+      <div class="profile-photo-wrap floating">
+        <div class="profile-photo-glow"></div>
+        <img src="profile.jpg.png" alt="Abdallah Eldakrory — AI Student & Vibe Coder" class="profile-photo" />
+        <div class="profile-badge">
+          <span class="badge-dot"></span>
+          <span data-i18n="hero_badge">متاح للعمل</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator"><div class="scroll-arrow"></div></div>
+  </section>
+
+  <!-- ===== PROJECTS ===== -->
+  <section class="projects" id="projects">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="projects_tag">المشاريع</span>
+      <h2 data-i18n="projects_title">شغلي بيتكلم عن نفسه</h2>
+      <p data-i18n="projects_desc">اضغط على أي مشروع وشوف الفيديو</p>
+    </div>
+    <!-- BENTO GRID — Cards injected by JS -->
+    <div class="bento-grid" id="bentoGrid"></div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section class="skills" id="skills">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="skills_tag">الأدوات</span>
+      <h2 data-i18n="skills_title">تقنياتي</h2>
+      <p data-i18n="skills_desc">الأدوات اللي بستخدمها في كل مشروع</p>
+    </div>
+    <div class="skills-grid">
+      <!-- AI & Automation -->
+      <div class="skill-pill ai-pill" style="border-color: rgba(99,102,241,0.5);"><span class="ai-icon">⚡</span>Vibe Coding</div>
+      <div class="skill-pill ai-pill"><span class="ai-icon">🤖</span>Cursor AI</div>
+      <div class="skill-pill ai-pill"><span class="ai-icon">🧠</span>Claude AI</div>
+      <div class="skill-pill ai-pill"><span class="ai-icon">⚙️</span>n8n Workflows</div>
+      <div class="skill-pill ai-pill"><span class="ai-icon">🎬</span>AI Video Creation</div>
+      
+      <!-- Development & Systems -->
+      <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg" alt="WordPress" />WordPress</div>
+      <div class="skill-pill" style="color: #fff;"><span class="ai-icon">💻</span>Landing Pages & Web Apps</div>
+      <div class="skill-pill" style="color: #fff;"><span class="ai-icon">📊</span>ERP Systems</div>
+      <div class="skill-pill" style="color: #fff;"><span class="ai-icon">🔐</span>Full System Control</div>
+    </div>
+  </section>
+
+  <!-- ===== PROCESS ===== -->
+  <section class="process">
+    <div class="section-header">
+      <span class="section-tag" data-i18n="process_tag">الطريقة</span>
+      <h2 data-i18n="process_title">إزاي بشتغل؟</h2>
+    </div>
+    <div class="process-steps">
+      <div class="step"><div class="step-num">01</div><h4 data-i18n="process_step1_title">الفكرة</h4><p data-i18n="process_step1_desc">بفهم المشروع بالكامل وبحدد هدفه الأساسي بدون كلام في الهوا</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><div class="step-num">02</div><h4 data-i18n="process_step2_title">التنفيذ</h4><p data-i18n="process_step2_desc">بستخدم أدوات الـ AI + خبرتي عشان أنفذ بأسرع وقت ممكن</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><div class="step-num">03</div><h4 data-i18n="process_step3_title">التسليم</h4><p data-i18n="process_step3_desc">بسلم الشغل مع فيديو شرح كامل ودعم ما بعد التسليم</p></div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-section" id="contact">
+    <div class="cta-glow"></div>
+    <div class="cta-content">
+      <span class="section-tag" data-i18n="contact_tag">ابدأ دلوقتي</span>
+      <h2 data-i18n="contact_title">عندك مشروع في دماغك؟</h2>
+      <p data-i18n="contact_desc">سواء كنت محتاج موقع WordPress أو تطبيق ويب أو Landing Page — تواصل معي وهنبدأ على طول.</p>
+      <div class="cta-buttons">
+        <a href="https://wa.me/201065374369?text=مرحبا،+شفت+بورتفوليوك+وعايز+أتكلم+معاك+عن+مشروع" class="btn-whatsapp" target="_blank" id="whatsapp-cta">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span data-i18n="contact_btn_wa">واتساب — تواصل فوراً</span>
+        </a>
+        <a href="mailto:andallaheldakrwry2066@gmail.com" class="btn-ghost" id="email-cta" data-i18n="contact_btn_email">📧 ابعت إيميل</a>
+      </div>
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/abdallah-eldakrory-27a973350/" target="_blank" class="social-link" id="linkedin-link" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p data-i18n="footer">صُنع بـ ❤️ + ⚡ AI &nbsp;|&nbsp; جميع الحقوق محفوظة © 2026</p>
+  </footer>
+
+  <!-- ===== VIDEO LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+    <div class="lightbox-overlay" onclick="closeLightbox()"></div>
+    <div class="lightbox-inner">
+      <button class="lightbox-close" onclick="closeLightbox()" aria-label="إغلاق">✕</button>
+      <div class="lightbox-player">
+        <video id="lightboxVideo" controls playsinline></video>
+        <iframe id="lightboxIframe" style="display:none; width: 100%; height: 100%; border:0;" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
