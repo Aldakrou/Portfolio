@@ -33,6 +33,14 @@ const translations = {
     process_step1_title: 'تحليل المتطلبات', process_step1_desc: 'دراسة وتحليل المشروع وتصميم المعمارية البرمجية الأنسب لضمان التوسع مستقبلاً.',
     process_step2_title: 'التطوير المتقدم', process_step2_desc: 'تطبيق أفضل معايير هندسة البرمجيات لبناء أنظمة سريعة، آمنة وموثوقة.',
     process_step3_title: 'التسليم والدعم', process_step3_desc: 'نشر النظام على بيئة الإنتاج مع تقديم دعم فني مستمر وتوثيق كامل للكود.',
+    services_tag: 'مجالات الخبرة', services_title: 'ماذا أقدم؟',
+    srv1_title: 'هندسة النظم والـ Enterprise', srv1_desc: 'بناء معمارية برمجية قابلة للتوسع والتكيف تضمن أمان وأداء استثنائي.',
+    srv2_title: 'تطوير الويب المتقدم', srv2_desc: 'برمجة تطبيقات الويب عالية التعقيد باستخدام أفضل تقنيات الـ Frontend والـ Backend.',
+    srv3_title: 'أنظمة إدارة الموارد (ERP)', srv3_desc: 'تحويل بيئات العمل المعقدة إلى أنظمة رقمية مركزية سريعة وموثوقة.',
+    exp_tag: 'رحلتي المهنية', exp_title: '+10 سنوات خبرة',
+    exp1_title: 'مهندس برمجيات أول', exp1_desc: 'قيادة فرق هندسية وتطوير منتجات رقمية متكاملة لخدمة آلاف المستخدمين اليوميين.',
+    exp2_title: 'Full-Stack Developer', exp2_desc: 'تصميم وتنفيذ تطبيقات ومتاجر إلكترونية ضخمة وتحسين تجربة العميل بنسبة تفوق الـ 40%.',
+    exp3_title: 'Backend Engineer', exp3_desc: 'برمجة قواعد البيانات وهيكلة تدفق البيانات للأنظمة المالية والمحاسبية.',
     contact_tag: 'ابدأ دلوقتي', contact_title: 'لديك مشروع برمجي ضخم؟', contact_desc: 'سواء كنت تحتاج لتطبيق ويب متقدم، نظام مؤسسي، أو متجر إلكتروني معقد — لنتحدث الآن.',
     contact_btn_wa: 'تواصل معي عبر واتساب', contact_btn_email: '📧 مراسلة عبر البريد',
     footer: 'صُنع بـ ❤️ + ⚡ AI &nbsp;|&nbsp; جميع الحقوق محفوظة © 2026',
@@ -52,6 +60,14 @@ const translations = {
     process_step1_title: 'Requirements Analysis', process_step1_desc: 'Deeply analyzing the project and architecting the best system design for future scalability.',
     process_step2_title: 'Advanced Engineering', process_step2_desc: 'Applying best software engineering practices to build fast, secure, and reliable systems.',
     process_step3_title: 'Delivery & Support', process_step3_desc: 'Deploying the system to production with continuous technical support and full code documentation.',
+    services_tag: 'My Expertise', services_title: 'What I Deliver',
+    srv1_title: 'Enterprise Architecture', srv1_desc: 'Building highly scalable and adaptable software architectures with exceptional security and performance.',
+    srv2_title: 'Advanced Web Development', srv2_desc: 'Programming complex dynamic web applications using top-tier frontend and backend technologies.',
+    srv3_title: 'ERP & Business Systems', srv3_desc: 'Transforming complex administrative workflows into blazing-fast, centralized digital systems.',
+    exp_tag: 'My Journey', exp_title: '10+ Years of Engineering',
+    exp1_title: 'Senior Software Engineer', exp1_desc: 'Leading engineering teams and developing full-scale digital products serving thousands of daily active users.',
+    exp2_title: 'Full-Stack Developer', exp2_desc: 'Designing and executing massive e-commerce applications and increasing user conversion by over 40%.',
+    exp3_title: 'Backend Engineer', exp3_desc: 'Developing resilient database schema and data flow architectures for financial systems.',
     contact_tag: 'Start Now', contact_title: 'Have a Massive Project?', contact_desc: 'Whether you need an advanced web app, an enterprise system, or a complex e-commerce — let’s talk.',
     contact_btn_wa: 'Contact via WhatsApp', contact_btn_email: '📧 Send an Email',
     footer: 'Made with ❤️ + ⚡ AI &nbsp;|&nbsp; All rights reserved © 2026',
@@ -124,6 +140,39 @@ let projects = loadProjects();
 // ============ RENDER ============
 const bentoGrid = document.getElementById('bentoGrid');
 
+// ============ CUSTOM CURSOR & MAGNETIC BUTTONS ============
+const cursor = document.getElementById('customCursor');
+if (cursor) {
+  document.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest('a, button, .bento-card, .skill-pill, .step')) {
+      cursor.classList.add('hover');
+    }
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('a, button, .bento-card, .skill-pill, .step')) {
+      cursor.classList.remove('hover');
+    }
+  });
+
+  // Magnetic effect for standard buttons
+  const magneticBtns = document.querySelectorAll('.btn-primary, .btn-ghost, .social-link');
+  magneticBtns.forEach(btn => {
+    btn.addEventListener('mousemove', function(e) {
+      const pos = this.getBoundingClientRect();
+      const x = e.clientX - pos.left - pos.width / 2;
+      const y = e.clientY - pos.top - pos.height / 2;
+      this.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+    });
+    btn.addEventListener('mouseleave', function() {
+      this.style.transform = `translate(0px, 0px)`;
+    });
+  });
+}
 function renderGrid() {
   bentoGrid.innerHTML = '';
   projects.forEach(p => bentoGrid.appendChild(createCard(p)));
