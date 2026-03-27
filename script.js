@@ -247,7 +247,10 @@ function handleCardClick(id, e) {
   if (document.body.classList.contains('edit-mode')) return;
   const p = projects.find(x => x.id === id);
   if (!p) return;
-  if (p.type === 'link' && p.link) return; // link handled by <a>
+  if (p.type === 'link' && p.link) {
+    window.open(p.link, '_blank', 'noopener,noreferrer');
+    return;
+  }
   const blobData = blobMap[id] || {};
   
   if (p.youtube) {
