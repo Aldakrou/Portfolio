@@ -281,7 +281,7 @@ function openLightboxYoutube(ytId) {
   lightboxVideo.pause();
   lightboxVideo.src = '';
   lightboxIframe.style.display = 'block';
-  lightboxIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+  lightboxIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0&vq=hd1080`;
   lightbox.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
