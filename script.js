@@ -77,7 +77,7 @@ const translations = {
   }
 };
 
-let currentLang = localStorage.getItem('portfolio_lang') || 'ar';
+let currentLang = localStorage.getItem('portfolio_lang') || 'en';
 
 function toggleLanguage() {
   currentLang = currentLang === 'ar' ? 'en' : 'ar';
